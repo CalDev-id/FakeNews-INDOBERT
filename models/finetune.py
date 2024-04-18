@@ -133,7 +133,7 @@ class FinetuneV1(pl.LightningModule):
 
         return pred[0]
 
-class V2(pl.LightningModule):
+class FinetuneV2(pl.LightningModule):
 
     def __init__(self, model, learning_rate=2e-5) -> None:
 
