@@ -5,11 +5,11 @@ from torch import nn
 from torch.nn import functional as F
 from sklearn.metrics import classification_report
 
-class Finetune(pl.LightningModule):
+class FinetuneV1(pl.LightningModule):
 
     def __init__(self, model, learning_rate=2e-5) -> None:
         # Inisialisasi kelas Finetune
-        super(Finetune, self).__init__()
+        super(FinetuneV1, self).__init__()
         self.model = model # Menggunakan model yang telah diinisialisasi
         self.lr = learning_rate # Menyimpan learning rate
 
