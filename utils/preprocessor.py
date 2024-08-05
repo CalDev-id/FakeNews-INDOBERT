@@ -30,15 +30,6 @@ class TwitterDataModule(pl.LightningDataModule):
         self.test_dataset_path = "datasets/test.csv"
         self.processed_dataset_path = "datasets/twitter_label_manual_processed.csv"
 
-
-    data = pd.read_csv('datasets/train.csv')
-    def pelabelan(label):
-        if label == 'Bullying':
-            return 1
-        else:
-            return 0
-    data['label'] = data['label'].apply(pelabelan)
-
     def load_data(self):
         # Load dataset if exists, else preprocess and save
         if os.path.exists(self.processed_dataset_path) and not self.recreate:
