@@ -200,16 +200,121 @@
     # kemudian di buat menjadi dataloader
 
 #baru 
+# import os
+# import re
+# import sys
+# import torch
+# import emoji
+# import string
+# import multiprocessing
+# import pytorch_lightning as pl
+# import pandas as pd
+
+# from tqdm import tqdm
+# from torch.utils.data import TensorDataset, DataLoader
+# from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
+
+# class TwitterDataModule(pl.LightningDataModule):
+
+#     def __init__(self, tokenizer, max_length=128, batch_size=32, recreate=False, one_hot_label=False) -> None:
+#         super(TwitterDataModule, self).__init__()
+#         self.seed = 42
+#         self.tokenizer = tokenizer
+#         self.max_length = max_length
+#         self.batch_size = batch_size
+#         self.recreate = recreate
+#         self.one_hot_label = one_hot_label
+#         self.train_dataset_path = "datasets/train.csv"
+#         self.validation_dataset_path = "datasets/validation.csv"
+#         self.test_dataset_path = "datasets/test.csv"
+#         self.processed_dataset_path = "datasets/twitter_label_manual_processed.csv"
+
+#     def load_data(self):
+#         # Load dataset if exists, else preprocess and save
+#         if os.path.exists(self.processed_dataset_path) and not self.recreate:
+#             print('[ Loading Dataset ]')
+#             dataset = pd.read_csv(self.processed_dataset_path)
+#             print('[ Load Completed ]\n')
+#         else:
+#             print('[ Preprocessing Dataset ]')
+#             # Read train, validation, and test datasets
+#             dataset_train = pd.read_csv(self.train_dataset_path)[["text", "headline", "label"]]
+#             dataset_valid = pd.read_csv(self.validation_dataset_path)[["text", "headline", "label"]]
+#             dataset_test = pd.read_csv(self.test_dataset_path)[["text", "headline", "label"]]
+
+#             # Add a 'step' column to identify the source (train, validation, test)
+#             dataset_train['step'] = 'train'
+#             dataset_valid['step'] = 'validation'
+#             dataset_test['step'] = 'test'
+
+#             # Concatenate all datasets into one
+#             dataset = pd.concat([dataset_train, dataset_valid, dataset_test], ignore_index=True)
+
+#             # Get stop words for Bahasa Indonesia using Sastrawi library
+#             self.stop_words = StopWordRemoverFactory().get_stop_words()
+
+#             # Clean and preprocess the 'text' column
+#             tqdm.pandas(desc='Preprocessing')
+#             dataset["text"] = dataset["text"].progress_apply(lambda x: self.clean_tweet(x))
+#             dataset.dropna(subset=['text'], inplace=True)
+#             print('[ Preprocess Completed ]\n')
+
+#             print('[ Saving Preprocessed Dataset ]')
+#             # Save the preprocessed dataset to a CSV file
+#             dataset.to_csv(self.processed_dataset_path, index=False)
+#             print('[ Save Completed ]\n')
+
+#         total_size = len(dataset.index)
+
+#         print('[ Tokenizing Dataset ]')
+
+#         # Initialize lists for tokenized inputs, attention masks, and labels
+#         train_x_input_ids, train_x_attention_mask, train_y = [], [], []
+#         valid_x_input_ids, valid_x_attention_mask, valid_y = [], [], []
+#         test_x_input_ids, test_x_attention_mask, test_y = [], [], []
+
+#         for (text, headline, label, step) in tqdm(dataset.values.tolist()):
+#             # Combine headline and text
+#             combined_text = f"{headline} [SEP] {text}"
+
+#             # One-hot encode labels if specified
+#             if self.one_hot_label:
+#                 default = [0]*2
+#                 default[label] = 1
+#                 label = default 
+
+#             # Tokenize the combined text using the provided tokenizer
+#             encoded_text = self.tokenizer.encode_plus(
+#                 combined_text,
+#                 max_length=self.max_length,
+#                 padding="max_length",
+#                 truncation=True,
+#                 return_tensors='pt'  # Return PyTorch tensors
+#             )
+            
+#             # Append the tokenized input, attention mask, and label to the corresponding lists based on the source
+#             if step == 'train':
+#                 train_x_input_ids.append(encoded_text['input_ids'].squeeze(0))  # Remove the batch dimension
+#                 train_x_attention_mask.append(encoded_text['attention_mask'].squeeze(0))
+#                 train_y.append(label)
+#             elif step == 'validation':
+#                 valid_x_input_ids.append(encoded_text['input_ids'].squeeze(0))
+#                 valid_x_attention_mask.append(encoded_text['attention_mask'].squeeze(0))
+#                 valid_y.append(label)
+#             elif step == 'test':
+#                 test_x_input_ids.append(encoded_text['input_ids'].squeeze(0))
+#                 test_x_attention_mask.append(encoded_text['attention_mask'].squeeze(0))
+#                 test_y.append(label)
+
+#         # Convert lists to PyTorch tensors
+#         train
+
+#baru bgt
 import os
 import re
-import sys
 import torch
-import emoji
-import string
-import multiprocessing
-import pytorch_lightning as pl
 import pandas as pd
-
+import pytorch_lightning as pl
 from tqdm import tqdm
 from torch.utils.data import TensorDataset, DataLoader
 from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
@@ -247,7 +352,7 @@ class TwitterDataModule(pl.LightningDataModule):
             dataset_valid['step'] = 'validation'
             dataset_test['step'] = 'test'
 
-            # Concatenate all datasets into one
+            # Concatenate all datasets into one for preprocessing
             dataset = pd.concat([dataset_train, dataset_valid, dataset_test], ignore_index=True)
 
             # Get stop words for Bahasa Indonesia using Sastrawi library
@@ -263,8 +368,6 @@ class TwitterDataModule(pl.LightningDataModule):
             # Save the preprocessed dataset to a CSV file
             dataset.to_csv(self.processed_dataset_path, index=False)
             print('[ Save Completed ]\n')
-
-        total_size = len(dataset.index)
 
         print('[ Tokenizing Dataset ]')
 
@@ -307,4 +410,68 @@ class TwitterDataModule(pl.LightningDataModule):
                 test_y.append(label)
 
         # Convert lists to PyTorch tensors
-        train
+        train_x_input_ids = torch.stack(train_x_input_ids)
+        train_x_attention_mask = torch.stack(train_x_attention_mask)
+        train_y = torch.tensor(train_y).float()
+
+        valid_x_input_ids = torch.stack(valid_x_input_ids)
+        valid_x_attention_mask = torch.stack(valid_x_attention_mask)
+        valid_y = torch.tensor(valid_y).float()
+
+        test_x_input_ids = torch.stack(test_x_input_ids)
+        test_x_attention_mask = torch.stack(test_x_attention_mask)
+        test_y = torch.tensor(test_y).float()
+
+        # Create TensorDatasets for train, validation, and test sets
+        train_dataset = TensorDataset(train_x_input_ids, train_x_attention_mask, train_y)
+        valid_dataset = TensorDataset(valid_x_input_ids, valid_x_attention_mask, valid_y)
+        test_dataset = TensorDataset(test_x_input_ids, test_x_attention_mask, test_y)
+
+        print('[ Tokenize Completed ]\n')
+
+        return train_dataset, valid_dataset, test_dataset
+
+    def clean_tweet(self, tweet):
+        result = tweet.lower()
+        result = re.sub(r'@\w+', 'user', result)  # remove user mention
+        result = re.sub(r'http\S+', '', result)  # remove links
+        result = re.sub(r'\d+', '', result)  # remove numbers
+        result = re.sub(r'[^a-zA-Z ]', '', result)  # keep only alphabets
+        result = ' '.join([word for word in result.split() if word not in self.stop_words])  # remove stopwords
+        result = result.strip()
+
+        if result == '':
+            result = None
+
+        return result
+
+    def setup(self, stage=None):
+        # Load datasets during the setup phase
+        train_data, valid_data, test_data = self.load_data()
+        if stage == "fit":
+            self.train_data = train_data
+            self.valid_data = valid_data
+        elif stage == "test":
+            self.test_data = test_data
+
+    def train_dataloader(self):
+        return DataLoader(
+            dataset=self.train_data,
+            batch_size=self.batch_size,
+            shuffle=True,
+            num_workers=os.cpu_count()
+        )
+
+    def val_dataloader(self):
+        return DataLoader(
+            dataset=self.valid_data,
+            batch_size=self.batch_size,
+            num_workers=os.cpu_count()
+        )
+
+    def test_dataloader(self):
+        return DataLoader(
+            dataset=self.test_data,
+            batch_size=self.batch_size,
+            num_workers=os.cpu_count()
+        )
