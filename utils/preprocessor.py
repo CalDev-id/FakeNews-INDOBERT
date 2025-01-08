@@ -343,9 +343,9 @@ class TwitterDataModule(pl.LightningDataModule):
         else:
             print('[ Preprocessing Dataset ]')
             # Read train, validation, and test datasets
-            dataset_train = pd.read_csv(self.train_dataset_path)[["text", "headline", "label"]]
-            dataset_valid = pd.read_csv(self.validation_dataset_path)[["text", "headline", "label"]]
-            dataset_test = pd.read_csv(self.test_dataset_path)[["text", "headline", "label"]]
+            dataset_train = pd.read_csv(self.train_dataset_path)[["text", "Headline", "label"]]
+            dataset_valid = pd.read_csv(self.validation_dataset_path)[["text", "Headline", "label"]]
+            dataset_test = pd.read_csv(self.test_dataset_path)[["text", "Headline", "label"]]
 
             # Add a 'step' column to identify the source (train, validation, test)
             dataset_train['step'] = 'train'
@@ -376,9 +376,9 @@ class TwitterDataModule(pl.LightningDataModule):
         valid_x_input_ids, valid_x_attention_mask, valid_y = [], [], []
         test_x_input_ids, test_x_attention_mask, test_y = [], [], []
 
-        for (text, headline, label, step) in tqdm(dataset.values.tolist()):
+        for (text, Headline, label, step) in tqdm(dataset.values.tolist()):
             # Combine headline and text
-            combined_text = f"{headline} [SEP] {text}"
+            combined_text = f"{Headline} [SEP] {text}"
 
             # One-hot encode labels if specified
             if self.one_hot_label:
