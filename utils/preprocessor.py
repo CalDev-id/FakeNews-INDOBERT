@@ -338,7 +338,7 @@ class TwitterDataModule(pl.LightningDataModule):
         self.train_dataset_path = "datasets/MendaleyTest/train.csv"
         self.validation_dataset_path = "datasets/MendaleyTest/validation.csv"
         self.test_dataset_path = "datasets/MendaleyTest/test.csv"
-        # self.processed_dataset_path = "datasets/twitter_label_manual_processed.csv"
+        self.processed_dataset_path = "datasets/twitter_label_manual_processed.csv"
     def load_data(self):
         # Load dataset if exists, else preprocess and save
         if os.path.exists(self.processed_dataset_path) and not self.recreate:
