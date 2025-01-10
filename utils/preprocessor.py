@@ -329,10 +329,10 @@ class TwitterDataModule(pl.LightningDataModule):
         self.batch_size = batch_size
         self.recreate = recreate
         self.one_hot_label = one_hot_label
-        self.train_dataset_path = "datasets/train.csv"
-        self.validation_dataset_path = "datasets/validation.csv"
-        self.test_dataset_path = "datasets/test.csv"
-        self.processed_dataset_path = "datasets/twitter_label_manual_processed.csv"
+        # self.train_dataset_path = "datasets/train.csv"
+        # self.validation_dataset_path = "datasets/validation.csv"
+        # self.test_dataset_path = "datasets/test.csv"
+        # self.processed_dataset_path = "datasets/twitter_label_manual_processed.csv"
             
         #mendaley
         # self.train_dataset_path = "datasets/MendaleyTest/train.csv"
@@ -341,10 +341,10 @@ class TwitterDataModule(pl.LightningDataModule):
         # self.processed_dataset_path = "datasets/twitter_label_manual_processed.csv"
 
                     #github
-        # self.train_dataset_path = "datasets/GithubTest/train.csv"
-        # self.validation_dataset_path = "datasets/GithubTest/validation.csv"
-        # self.test_dataset_path = "datasets/GithubTest/test.csv"
-        # self.processed_dataset_path = "datasets/twitter_label_manual_processed.csv"
+        self.train_dataset_path = "datasets/GithubTest/train.csv"
+        self.validation_dataset_path = "datasets/GithubTest/validation.csv"
+        self.test_dataset_path = "datasets/GithubTest/test.csv"
+        self.processed_dataset_path = "datasets/twitter_label_manual_processed.csv"
     def load_data(self):
         # Load dataset if exists, else preprocess and save
         if os.path.exists(self.processed_dataset_path) and not self.recreate:
